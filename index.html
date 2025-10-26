@@ -3,152 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>🏎️ Luxury Car Racing</title>
+    <title>🏎️ Luxury Racing</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="background-animation"></div>
     <div class="game-container">
-        <div class="game-header">
-            <div class="logo-section">
-                <h1 class="game-title">🏎️ LUXURY RACING</h1>
-                <div class="subtitle">Premium Car Experience</div>
-            </div>
-            
-            <div class="score-display">
-                <div class="score-item">
-                    <div class="score-icon">🏆</div>
-                    <span class="score-label">Score</span>
-                    <span id="score" class="score-value">0</span>
+        <!-- Header -->
+        <div class="header">
+            <h1>🏎️ Luxury Racing</h1>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-label">Score</span>
+                    <span id="score" class="stat-value">0</span>
                 </div>
-                <div class="score-item">
-                    <div class="score-icon">⚡</div>
-                    <span class="score-label">Speed</span>
-                    <span id="speed" class="score-value">1</span>
+                <div class="stat">
+                    <span class="stat-label">Speed</span>
+                    <span id="speed" class="stat-value">1</span>
                 </div>
-                <div class="score-item">
-                    <div class="score-icon">🚗</div>
-                    <span class="score-label">Avoided</span>
-                    <span id="carsAvoided" class="score-value">0</span>
+                <div class="stat">
+                    <span class="stat-label">Coins</span>
+                    <span id="coins" class="stat-value">0</span>
                 </div>
-                <div class="score-item">
-                    <div class="score-icon">💰</div>
-                    <span class="score-label">Coins</span>
-                    <span id="coins" class="score-value">0</span>
-                </div>
-            </div>
-            
-            <div class="weather-display">
-                <div class="weather-icon" id="weatherIcon">☀️</div>
-                <div class="time-display" id="timeDisplay">Day</div>
             </div>
         </div>
-        
-        <div class="game-canvas-container">
+
+        <!-- Game Canvas -->
+        <div class="game-area">
             <canvas id="gameCanvas" width="400" height="600"></canvas>
-            <div class="speed-indicator" id="speedIndicator">
+            <div class="speed-meter">
                 <div class="speed-bar">
-                    <div class="speed-fill" id="speedFill"></div>
+                    <div id="speedFill" class="speed-fill"></div>
                 </div>
-                <span class="speed-text">SPEED</span>
+                <span class="speed-label">SPEED</span>
             </div>
         </div>
-        
-        <div class="game-controls">
-            <div class="car-selection">
-                <h3>🏎️ Select Your Car</h3>
-                <div class="car-options">
-                    <div class="car-option active" data-car="ferrari">
-                        <div class="car-preview ferrari-preview"></div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="car-selector">
+                <h3>Choose Your Car</h3>
+                <div class="cars">
+                    <div class="car active" data-car="ferrari">
+                        <div class="car-icon ferrari">🏎️</div>
                         <span>Ferrari</span>
                     </div>
-                    <div class="car-option" data-car="lamborghini">
-                        <div class="car-preview lamborghini-preview"></div>
-                        <span>Lamborghini</span>
+                    <div class="car" data-car="lamborghini">
+                        <div class="car-icon lamborghini">🚗</div>
+                        <span>Lambo</span>
                     </div>
-                    <div class="car-option" data-car="porsche">
-                        <div class="car-preview porsche-preview"></div>
+                    <div class="car" data-car="porsche">
+                        <div class="car-icon porsche">🏁</div>
                         <span>Porsche</span>
                     </div>
-                    <div class="car-option" data-car="mclaren">
-                        <div class="car-preview mclaren-preview"></div>
+                    <div class="car" data-car="mclaren">
+                        <div class="car-icon mclaren">🏎️</div>
                         <span>McLaren</span>
                     </div>
                 </div>
             </div>
-            
-            <div class="instructions">
-                <h3>🎮 Controls</h3>
-                <div class="control-info">
-                    <div class="control-item">
-                        <span class="control-icon">🖥️</span>
-                        <span>Desktop: Arrow Keys or A & D</span>
-                    </div>
-                    <div class="control-item">
-                        <span class="control-icon">📱</span>
-                        <span>Mobile: Touch and drag to move</span>
-                    </div>
-                </div>
+
+            <div class="buttons">
+                <button id="startBtn" class="btn btn-start">Start Race</button>
+                <button id="pauseBtn" class="btn btn-pause" disabled>Pause</button>
+                <button id="resetBtn" class="btn btn-reset">Reset</button>
             </div>
-            
-            <div class="game-buttons">
-                <button id="startBtn" class="btn btn-primary">
-                    <span class="btn-icon">🏁</span>
-                    <span>Start Race</span>
-                </button>
-                <button id="pauseBtn" class="btn btn-secondary" disabled>
-                    <span class="btn-icon">⏸️</span>
-                    <span>Pause</span>
-                </button>
-                <button id="resetBtn" class="btn btn-tertiary">
-                    <span class="btn-icon">🔄</span>
-                    <span>Reset</span>
-                </button>
+
+            <div class="instructions">
+                <p><strong>Desktop:</strong> Arrow Keys or A & D</p>
+                <p><strong>Mobile:</strong> Touch and drag to move</p>
             </div>
         </div>
-        
+
+        <!-- Game Over Screen -->
         <div id="gameOver" class="game-over hidden">
             <div class="game-over-content">
                 <h2>💥 Race Over!</h2>
                 <div class="final-stats">
-                    <div class="stat-item">
-                        <span class="stat-icon">🏆</span>
-                        <span class="stat-label">Final Score</span>
-                        <span id="finalScore" class="stat-value">0</span>
+                    <div class="final-stat">
+                        <span class="final-label">Final Score</span>
+                        <span id="finalScore" class="final-value">0</span>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-icon">🚗</span>
-                        <span class="stat-label">Cars Avoided</span>
-                        <span id="finalCarsAvoided" class="stat-value">0</span>
+                    <div class="final-stat">
+                        <span class="final-label">Cars Avoided</span>
+                        <span id="finalCarsAvoided" class="final-value">0</span>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-icon">⚡</span>
-                        <span class="stat-label">Max Speed</span>
-                        <span id="finalSpeed" class="stat-value">1</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-icon">💰</span>
-                        <span class="stat-label">Coins Earned</span>
-                        <span id="finalCoins" class="stat-value">0</span>
+                    <div class="final-stat">
+                        <span class="final-label">Coins Earned</span>
+                        <span id="finalCoins" class="final-value">0</span>
                     </div>
                 </div>
-                <div class="achievements" id="achievements"></div>
-                <button id="restartBtn" class="btn btn-primary">
-                    <span class="btn-icon">🏁</span>
-                    <span>Race Again</span>
-                </button>
-            </div>
-        </div>
-        
-        <!-- Mobile Touch Controls -->
-        <div class="mobile-controls">
-            <div class="touch-area" id="touchArea">
-                <div class="touch-indicator"></div>
+                <button id="restartBtn" class="btn btn-start">Race Again</button>
             </div>
         </div>
     </div>
-    
+
     <script src="game.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-class LuxuryCarRacingGame {
+class CleanLuxuryRacingGame {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
@@ -36,7 +36,7 @@ class LuxuryCarRacingGame {
         
         // Obstacles
         this.obstacles = [];
-        this.obstacleSpawnRate = 0.006;
+        this.obstacleSpawnRate = 0.005;
         this.obstacleSpeed = 2;
         this.lastObstacleSpawn = 0;
         
@@ -64,14 +64,13 @@ class LuxuryCarRacingGame {
     }
     
     initBackgroundElements() {
-        // Create background scenery
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 15; i++) {
             this.backgroundElements.push({
                 x: Math.random() * this.canvas.width,
                 y: Math.random() * this.canvas.height,
                 type: Math.random() > 0.5 ? 'tree' : 'building',
-                size: Math.random() * 30 + 20,
-                speed: Math.random() * 0.5 + 0.2
+                size: Math.random() * 25 + 15,
+                speed: Math.random() * 0.3 + 0.1
             });
         }
     }
@@ -106,7 +105,7 @@ class LuxuryCarRacingGame {
             const touchX = touch.clientX - rect.left;
             const deltaX = touchX - this.touchStartX;
             
-            this.player.x += deltaX * 0.5;
+            this.player.x += deltaX * 0.6;
             this.touchStartX = touchX;
             this.constrainPlayerToRoad();
         });
@@ -131,7 +130,7 @@ class LuxuryCarRacingGame {
             const mouseX = e.clientX - rect.left;
             const deltaX = mouseX - this.touchStartX;
             
-            this.player.x += deltaX * 0.3;
+            this.player.x += deltaX * 0.4;
             this.touchStartX = mouseX;
             this.constrainPlayerToRoad();
         });
@@ -148,9 +147,9 @@ class LuxuryCarRacingGame {
         document.getElementById('restartBtn').addEventListener('click', () => this.restartGame());
         
         // Car selection
-        document.querySelectorAll('.car-option').forEach(option => {
+        document.querySelectorAll('.car').forEach(option => {
             option.addEventListener('click', () => {
-                document.querySelectorAll('.car-option').forEach(opt => opt.classList.remove('active'));
+                document.querySelectorAll('.car').forEach(opt => opt.classList.remove('active'));
                 option.classList.add('active');
                 this.selectedCar = option.dataset.car;
                 this.updatePlayerCar();
@@ -198,11 +197,11 @@ class LuxuryCarRacingGame {
     togglePause() {
         if (this.gameState === 'playing') {
             this.gameState = 'paused';
-            document.getElementById('pauseBtn').innerHTML = '<span class="btn-icon">▶️</span><span>Resume</span>';
+            document.getElementById('pauseBtn').textContent = 'Resume';
             cancelAnimationFrame(this.animationId);
         } else if (this.gameState === 'paused') {
             this.gameState = 'playing';
-            document.getElementById('pauseBtn').innerHTML = '<span class="btn-icon">⏸️</span><span>Pause</span>';
+            document.getElementById('pauseBtn').textContent = 'Pause';
             this.gameLoop();
         }
     }
@@ -221,7 +220,7 @@ class LuxuryCarRacingGame {
         
         document.getElementById('startBtn').disabled = false;
         document.getElementById('pauseBtn').disabled = true;
-        document.getElementById('pauseBtn').innerHTML = '<span class="btn-icon">⏸️</span><span>Pause</span>';
+        document.getElementById('pauseBtn').textContent = 'Pause';
         document.getElementById('gameOver').classList.add('hidden');
         
         this.updateUI();
@@ -260,33 +259,18 @@ class LuxuryCarRacingGame {
     updateRealTimeFeatures(deltaTime) {
         // Weather changes
         this.weatherTimer += deltaTime;
-        if (this.weatherTimer > 30000) { // 30 seconds
+        if (this.weatherTimer > 25000) {
             this.weatherTimer = 0;
             const weathers = ['sunny', 'rainy', 'cloudy'];
             this.weather = weathers[Math.floor(Math.random() * weathers.length)];
-            this.updateWeatherDisplay();
         }
         
         // Day/night cycle
         this.dayTimer += deltaTime;
-        if (this.dayTimer > 60000) { // 1 minute
+        if (this.dayTimer > 45000) {
             this.dayTimer = 0;
             this.timeOfDay = this.timeOfDay === 'day' ? 'night' : 'day';
-            this.updateTimeDisplay();
         }
-    }
-    
-    updateWeatherDisplay() {
-        const weatherIcons = {
-            sunny: '☀️',
-            rainy: '🌧️',
-            cloudy: '☁️'
-        };
-        document.getElementById('weatherIcon').textContent = weatherIcons[this.weather];
-    }
-    
-    updateTimeDisplay() {
-        document.getElementById('timeDisplay').textContent = this.timeOfDay === 'day' ? 'Day' : 'Night';
     }
     
     handleInput() {
@@ -309,7 +293,7 @@ class LuxuryCarRacingGame {
     spawnObstacles() {
         const currentTime = Date.now();
         const timeSinceLastSpawn = currentTime - this.lastObstacleSpawn;
-        const minSpawnInterval = 2000;
+        const minSpawnInterval = 1800;
         
         if (Math.random() < this.obstacleSpawnRate && timeSinceLastSpawn > minSpawnInterval) {
             const lane = Math.floor(Math.random() * this.road.lanes);
@@ -321,7 +305,7 @@ class LuxuryCarRacingGame {
                 y: -80,
                 width: 40,
                 height: 80,
-                speed: this.obstacleSpeed + Math.random() * 1.5,
+                speed: this.obstacleSpeed + Math.random() * 1.2,
                 color: carData.color,
                 accent: carData.accent,
                 brand: carData.brand
@@ -339,8 +323,8 @@ class LuxuryCarRacingGame {
             if (obstacle.y > this.canvas.height) {
                 this.obstacles.splice(i, 1);
                 this.carsAvoided++;
-                this.score += 30;
-                this.coins += Math.floor(Math.random() * 3) + 1;
+                this.score += 25;
+                this.coins += Math.floor(Math.random() * 2) + 1;
                 this.addParticles(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2, 'coin');
             }
         }
@@ -362,17 +346,17 @@ class LuxuryCarRacingGame {
     
     addParticles(x, y, type) {
         const colors = type === 'coin' ? ['#FFD700', '#FFA500'] : ['#e74c3c', '#f39c12'];
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 4; i++) {
             this.particles.push({
                 x: x,
                 y: y,
-                vx: (Math.random() - 0.5) * 4,
-                vy: (Math.random() - 0.5) * 4,
+                vx: (Math.random() - 0.5) * 3,
+                vy: (Math.random() - 0.5) * 3,
                 color: colors[Math.floor(Math.random() * colors.length)],
-                life: 30,
-                maxLife: 30,
+                life: 25,
+                maxLife: 25,
                 alpha: 1,
-                size: Math.random() * 3 + 2
+                size: Math.random() * 2 + 1
             });
         }
     }
@@ -408,54 +392,32 @@ class LuxuryCarRacingGame {
         this.gameState = 'gameOver';
         document.getElementById('finalScore').textContent = this.score;
         document.getElementById('finalCarsAvoided').textContent = this.carsAvoided;
-        document.getElementById('finalSpeed').textContent = this.speed;
         document.getElementById('finalCoins').textContent = this.coins;
-        
-        // Show achievements
-        this.showAchievements();
         
         document.getElementById('gameOver').classList.remove('hidden');
         cancelAnimationFrame(this.animationId);
     }
     
-    showAchievements() {
-        const achievements = [];
-        if (this.carsAvoided >= 10) achievements.push('🏆 Speed Demon');
-        if (this.score >= 1000) achievements.push('💰 High Roller');
-        if (this.speed >= 5) achievements.push('⚡ Speed Master');
-        if (this.coins >= 50) achievements.push('💎 Coin Collector');
-        
-        const achievementsDiv = document.getElementById('achievements');
-        achievementsDiv.innerHTML = '';
-        achievements.forEach(achievement => {
-            const div = document.createElement('div');
-            div.className = 'achievement';
-            div.textContent = achievement;
-            achievementsDiv.appendChild(div);
-        });
-    }
-    
     updateScore() {
-        this.score += Math.floor(this.gameSpeed * 0.3);
+        this.score += Math.floor(this.gameSpeed * 0.2);
     }
     
     increaseDifficulty() {
-        if (this.score > 0 && this.score % 500 === 0) {
-            this.speed = Math.min(10, Math.floor(this.score / 500) + 1);
-            this.gameSpeed = Math.min(5, 2 + this.score / 3000);
-            this.obstacleSpawnRate = Math.min(0.012, 0.006 + this.score / 20000);
+        if (this.score > 0 && this.score % 400 === 0) {
+            this.speed = Math.min(8, Math.floor(this.score / 400) + 1);
+            this.gameSpeed = Math.min(4, 2 + this.score / 2500);
+            this.obstacleSpawnRate = Math.min(0.008, 0.005 + this.score / 15000);
         }
     }
     
     updateUI() {
         document.getElementById('score').textContent = this.score;
         document.getElementById('speed').textContent = this.speed;
-        document.getElementById('carsAvoided').textContent = this.carsAvoided;
         document.getElementById('coins').textContent = this.coins;
         
         // Update speed indicator
         const speedFill = document.getElementById('speedFill');
-        const speedPercent = (this.speed / 10) * 100;
+        const speedPercent = (this.speed / 8) * 100;
         speedFill.style.height = speedPercent + '%';
     }
     
@@ -476,7 +438,6 @@ class LuxuryCarRacingGame {
     }
     
     drawBackground() {
-        // Dynamic background based on time and weather
         let gradient;
         if (this.timeOfDay === 'night') {
             gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
@@ -502,21 +463,20 @@ class LuxuryCarRacingGame {
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
-        // Weather effects
         if (this.weather === 'rainy') {
             this.drawRain();
         }
     }
     
     drawRain() {
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
         this.ctx.lineWidth = 1;
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 30; i++) {
             const x = Math.random() * this.canvas.width;
-            const y = (Math.random() * this.canvas.height + Date.now() * 0.1) % this.canvas.height;
+            const y = (Math.random() * this.canvas.height + Date.now() * 0.05) % this.canvas.height;
             this.ctx.beginPath();
             this.ctx.moveTo(x, y);
-            this.ctx.lineTo(x + 2, y + 10);
+            this.ctx.lineTo(x + 1, y + 8);
             this.ctx.stroke();
         }
     }
@@ -527,20 +487,18 @@ class LuxuryCarRacingGame {
             if (element.type === 'tree') {
                 this.ctx.fillRect(element.x, element.y, element.size, element.size);
             } else {
-                this.ctx.fillRect(element.x, element.y, element.size, element.size * 1.5);
+                this.ctx.fillRect(element.x, element.y, element.size, element.size * 1.3);
             }
         }
     }
     
     drawRoad() {
-        // Road background
         this.ctx.fillStyle = this.timeOfDay === 'night' ? '#34495e' : '#2c3e50';
         this.ctx.fillRect(this.road.x, 0, this.road.width, this.canvas.height);
         
-        // Road markings
         this.ctx.strokeStyle = this.timeOfDay === 'night' ? '#f1c40f' : '#f39c12';
-        this.ctx.lineWidth = 3;
-        this.ctx.setLineDash([20, 20]);
+        this.ctx.lineWidth = 2;
+        this.ctx.setLineDash([15, 15]);
         
         for (let i = 1; i < this.road.lanes; i++) {
             const x = this.road.x + i * this.road.laneWidth;
@@ -552,7 +510,6 @@ class LuxuryCarRacingGame {
         
         this.ctx.setLineDash([]);
         
-        // Road edges
         this.ctx.strokeStyle = '#fff';
         this.ctx.lineWidth = 2;
         this.ctx.strokeRect(this.road.x, 0, this.road.width, this.canvas.height);
@@ -571,78 +528,64 @@ class LuxuryCarRacingGame {
     }
     
     drawLuxuryCar(x, y, width, height, color, accent, brand, isPlayer) {
-        // Car body with luxury styling
+        // Car body
         this.ctx.fillStyle = color;
         this.ctx.beginPath();
-        this.ctx.roundRect(x, y, width, height, 10);
+        this.ctx.roundRect(x, y, width, height, 8);
         this.ctx.fill();
         
-        // Luxury shine effect
+        // Shine effect
         const gradient = this.ctx.createLinearGradient(x, y, x + width, y + height);
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
-        gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.1)');
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0.3)');
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+        gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.05)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0.2)');
         this.ctx.fillStyle = gradient;
         this.ctx.fill();
         
-        // Car outline
+        // Outline
         this.ctx.strokeStyle = '#2c3e50';
         this.ctx.lineWidth = 2;
         this.ctx.stroke();
         
         // Windshield
-        this.ctx.fillStyle = 'rgba(52, 152, 219, 0.4)';
-        this.ctx.fillRect(x + 5, y + 8, width - 10, 20);
-        
-        // Side windows
         this.ctx.fillStyle = 'rgba(52, 152, 219, 0.3)';
-        this.ctx.fillRect(x + 3, y + 12, 8, 15);
-        this.ctx.fillRect(x + width - 11, y + 12, 8, 15);
+        this.ctx.fillRect(x + 5, y + 8, width - 10, 18);
         
-        // Luxury headlights
+        // Headlights
         this.ctx.fillStyle = accent;
         this.ctx.shadowColor = accent;
-        this.ctx.shadowBlur = 10;
+        this.ctx.shadowBlur = 8;
         this.ctx.beginPath();
-        this.ctx.arc(x + 8, y + 5, 4, 0, Math.PI * 2);
-        this.ctx.arc(x + width - 8, y + 5, 4, 0, Math.PI * 2);
+        this.ctx.arc(x + 8, y + 5, 3, 0, Math.PI * 2);
+        this.ctx.arc(x + width - 8, y + 5, 3, 0, Math.PI * 2);
         this.ctx.fill();
         this.ctx.shadowBlur = 0;
         
-        // Luxury grille
-        this.ctx.fillStyle = '#2c3e50';
-        this.ctx.fillRect(x + 12, y + 2, width - 24, 5);
-        
-        // Luxury wheels with chrome rims
+        // Wheels
         this.ctx.fillStyle = '#2c3e50';
         this.ctx.beginPath();
-        this.ctx.arc(x - 2, y + 20, 7, 0, Math.PI * 2);
-        this.ctx.arc(x + width + 2, y + 20, 7, 0, Math.PI * 2);
-        this.ctx.arc(x - 2, y + height - 20, 7, 0, Math.PI * 2);
-        this.ctx.arc(x + width + 2, y + height - 20, 7, 0, Math.PI * 2);
+        this.ctx.arc(x - 2, y + 18, 6, 0, Math.PI * 2);
+        this.ctx.arc(x + width + 2, y + 18, 6, 0, Math.PI * 2);
+        this.ctx.arc(x - 2, y + height - 18, 6, 0, Math.PI * 2);
+        this.ctx.arc(x + width + 2, y + height - 18, 6, 0, Math.PI * 2);
         this.ctx.fill();
         
-        // Chrome rims
+        // Rims
         this.ctx.fillStyle = accent;
         this.ctx.beginPath();
-        this.ctx.arc(x - 2, y + 20, 5, 0, Math.PI * 2);
-        this.ctx.arc(x + width + 2, y + 20, 5, 0, Math.PI * 2);
-        this.ctx.arc(x - 2, y + height - 20, 5, 0, Math.PI * 2);
-        this.ctx.arc(x + width + 2, y + height - 20, 5, 0, Math.PI * 2);
+        this.ctx.arc(x - 2, y + 18, 4, 0, Math.PI * 2);
+        this.ctx.arc(x + width + 2, y + 18, 4, 0, Math.PI * 2);
+        this.ctx.arc(x - 2, y + height - 18, 4, 0, Math.PI * 2);
+        this.ctx.arc(x + width + 2, y + height - 18, 4, 0, Math.PI * 2);
         this.ctx.fill();
         
         // Brand logo
         if (isPlayer) {
             this.ctx.fillStyle = '#fff';
-            this.ctx.font = 'bold 10px Arial';
+            this.ctx.font = 'bold 8px Arial';
             this.ctx.textAlign = 'center';
-            this.ctx.fillText('🏎️', x + width/2, y + height/2 + 3);
+            this.ctx.fillText('🏎️', x + width/2, y + height/2 + 2);
         }
-        
-        // Side mirrors
-        this.ctx.fillStyle = color;
-        this.ctx.fillRect(x - 3, y + 8, 2, 5);
-        this.ctx.fillRect(x + width + 1, y + 8, 2, 5);
     }
     
     drawParticles() {
@@ -658,38 +601,37 @@ class LuxuryCarRacingGame {
     }
     
     drawEffects() {
-        // Speed lines
         if (this.gameSpeed > 2) {
-            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
             this.ctx.lineWidth = 2;
             
-            for (let i = 0; i < 8; i++) {
+            for (let i = 0; i < 6; i++) {
                 const x = this.road.x + Math.random() * this.road.width;
                 const y = Math.random() * this.canvas.height;
                 this.ctx.beginPath();
                 this.ctx.moveTo(x, y);
-                this.ctx.lineTo(x - 25, y + 25);
+                this.ctx.lineTo(x - 20, y + 20);
                 this.ctx.stroke();
             }
         }
     }
     
     drawPauseScreen() {
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
         this.ctx.fillStyle = '#fff';
-        this.ctx.font = 'bold 48px Orbitron';
+        this.ctx.font = 'bold 36px Inter';
         this.ctx.textAlign = 'center';
         this.ctx.fillText('PAUSED', this.canvas.width / 2, this.canvas.height / 2);
         
-        this.ctx.font = '24px Rajdhani';
-        this.ctx.fillText('Press Pause to Resume', this.canvas.width / 2, this.canvas.height / 2 + 50);
+        this.ctx.font = '18px Inter';
+        this.ctx.fillText('Press Pause to Resume', this.canvas.width / 2, this.canvas.height / 2 + 40);
     }
 }
 
 // Initialize game when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    const game = new LuxuryCarRacingGame();
+    const game = new CleanLuxuryRacingGame();
     game.draw();
 });
