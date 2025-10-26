@@ -12,6 +12,7 @@ class CarRacingGame {
         this.gameSpeed = 2;
         this.lastTime = 0;
         this.animationId = null;
+        this.carsAvoided = 0;
         
         // Player car
         this.player = {
@@ -20,13 +21,15 @@ class CarRacingGame {
             width: 50,
             height: 80,
             speed: 5,
-            color: '#3498db'
+            color: '#e74c3c',
+            brand: 'Ferrari'
         };
         
         // Obstacles
         this.obstacles = [];
-        this.obstacleSpawnRate = 0.02;
+        this.obstacleSpawnRate = 0.008; // Reduced spawn rate for better balance
         this.obstacleSpeed = 2;
+        this.lastObstacleSpawn = 0;
         
         // Road
         this.road = {
@@ -147,6 +150,7 @@ class CarRacingGame {
         this.score = 0;
         this.speed = 1;
         this.gameSpeed = 2;
+        this.carsAvoided = 0;
         this.obstacles = [];
         this.player.x = this.canvas.width / 2 - 25;
         this.player.y = this.canvas.height - 100;
@@ -205,24 +209,43 @@ class CarRacingGame {
     }
     
     spawnObstacles() {
-        if (Math.random() < this.obstacleSpawnRate) {
+        // Improved spawning logic with better spacing
+        const currentTime = Date.now();
+        const timeSinceLastSpawn = currentTime - this.lastObstacleSpawn;
+        const minSpawnInterval = 1500; // Minimum 1.5 seconds between spawns
+        
+        if (Math.random() < this.obstacleSpawnRate && timeSinceLastSpawn > minSpawnInterval) {
             const lane = Math.floor(Math.random() * this.road.lanes);
             const x = this.road.x + lane * this.road.laneWidth + (this.road.laneWidth - 40) / 2;
+            const carData = this.getRandomCar();
             
             this.obstacles.push({
                 x: x,
                 y: -80,
                 width: 40,
                 height: 80,
-                speed: this.obstacleSpeed + Math.random() * 2,
-                color: this.getRandomCarColor()
+                speed: this.obstacleSpeed + Math.random() * 1.5, // Reduced speed variation
+                color: carData.color,
+                accent: carData.accent,
+                brand: carData.brand
             });
+            
+            this.lastObstacleSpawn = currentTime;
         }
     }
     
-    getRandomCarColor() {
-        const colors = ['#e74c3c', '#f39c12', '#2ecc71', '#9b59b6', '#34495e', '#e67e22'];
-        return colors[Math.floor(Math.random() * colors.length)];
+    getRandomCar() {
+        const carBrands = [
+            { brand: 'BMW', color: '#2c3e50', accent: '#f39c12' },
+            { brand: 'Mercedes', color: '#34495e', accent: '#ecf0f1' },
+            { brand: 'Audi', color: '#e74c3c', accent: '#f1c40f' },
+            { brand: 'Porsche', color: '#2c3e50', accent: '#e74c3c' },
+            { brand: 'Lamborghini', color: '#f39c12', accent: '#2c3e50' },
+            { brand: 'Tesla', color: '#34495e', accent: '#3498db' },
+            { brand: 'Toyota', color: '#e67e22', accent: '#ecf0f1' },
+            { brand: 'Honda', color: '#2ecc71', accent: '#2c3e50' }
+        ];
+        return carBrands[Math.floor(Math.random() * carBrands.length)];
     }
     
     updateObstacles() {
@@ -233,7 +256,8 @@ class CarRacingGame {
             // Remove obstacles that are off screen
             if (obstacle.y > this.canvas.height) {
                 this.obstacles.splice(i, 1);
-                this.score += 10; // Score for avoiding obstacles
+                this.carsAvoided++;
+                this.score += 25; // Better score for avoiding obstacles
             }
         }
     }
@@ -257,26 +281,30 @@ class CarRacingGame {
     gameOver() {
         this.gameState = 'gameOver';
         document.getElementById('finalScore').textContent = this.score;
+        document.getElementById('finalCarsAvoided').textContent = this.carsAvoided;
+        document.getElementById('finalSpeed').textContent = this.speed;
         document.getElementById('gameOver').classList.remove('hidden');
         cancelAnimationFrame(this.animationId);
     }
     
     updateScore() {
-        this.score += Math.floor(this.gameSpeed);
+        // Better scoring system
+        this.score += Math.floor(this.gameSpeed * 0.5); // Reduced base score
     }
     
     increaseDifficulty() {
-        // Increase speed every 1000 points
-        if (this.score > 0 && this.score % 1000 === 0) {
-            this.speed = Math.min(10, Math.floor(this.score / 1000) + 1);
-            this.gameSpeed = Math.min(5, 2 + this.score / 2000);
-            this.obstacleSpawnRate = Math.min(0.05, 0.02 + this.score / 10000);
+        // More balanced difficulty progression
+        if (this.score > 0 && this.score % 500 === 0) {
+            this.speed = Math.min(8, Math.floor(this.score / 500) + 1);
+            this.gameSpeed = Math.min(4, 2 + this.score / 3000);
+            this.obstacleSpawnRate = Math.min(0.015, 0.008 + this.score / 15000);
         }
     }
     
     updateUI() {
         document.getElementById('score').textContent = this.score;
         document.getElementById('speed').textContent = this.speed;
+        document.getElementById('carsAvoided').textContent = this.carsAvoided;
     }
     
     draw() {
@@ -321,41 +349,79 @@ class CarRacingGame {
     }
     
     drawPlayer() {
-        // Car body
-        this.ctx.fillStyle = this.player.color;
-        this.ctx.fillRect(this.player.x, this.player.y, this.player.width, this.player.height);
-        
-        // Car details
-        this.ctx.fillStyle = '#2c3e50';
-        this.ctx.fillRect(this.player.x + 5, this.player.y + 10, this.player.width - 10, 20);
-        this.ctx.fillRect(this.player.x + 5, this.player.y + 50, this.player.width - 10, 20);
-        
-        // Wheels
-        this.ctx.fillStyle = '#2c3e50';
-        this.ctx.fillRect(this.player.x - 5, this.player.y + 15, 8, 15);
-        this.ctx.fillRect(this.player.x + this.player.width - 3, this.player.y + 15, 8, 15);
-        this.ctx.fillRect(this.player.x - 5, this.player.y + 50, 8, 15);
-        this.ctx.fillRect(this.player.x + this.player.width - 3, this.player.y + 50, 8, 15);
+        this.drawRealisticCar(this.player.x, this.player.y, this.player.width, this.player.height, 
+                             this.player.color, '#f1c40f', this.player.brand, true);
     }
     
     drawObstacles() {
         for (const obstacle of this.obstacles) {
-            // Car body
-            this.ctx.fillStyle = obstacle.color;
-            this.ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-            
-            // Car details
-            this.ctx.fillStyle = '#2c3e50';
-            this.ctx.fillRect(obstacle.x + 3, obstacle.y + 8, obstacle.width - 6, 15);
-            this.ctx.fillRect(obstacle.x + 3, obstacle.y + 40, obstacle.width - 6, 15);
-            
-            // Wheels
-            this.ctx.fillStyle = '#2c3e50';
-            this.ctx.fillRect(obstacle.x - 3, obstacle.y + 12, 6, 12);
-            this.ctx.fillRect(obstacle.x + obstacle.width - 3, obstacle.y + 12, 6, 12);
-            this.ctx.fillRect(obstacle.x - 3, obstacle.y + 40, 6, 12);
-            this.ctx.fillRect(obstacle.x + obstacle.width - 3, obstacle.y + 40, 6, 12);
+            this.drawRealisticCar(obstacle.x, obstacle.y, obstacle.width, obstacle.height, 
+                                 obstacle.color, obstacle.accent, obstacle.brand, false);
         }
+    }
+    
+    drawRealisticCar(x, y, width, height, color, accent, brand, isPlayer) {
+        // Car body with rounded corners
+        this.ctx.fillStyle = color;
+        this.ctx.beginPath();
+        this.ctx.roundRect(x, y, width, height, 8);
+        this.ctx.fill();
+        
+        // Car shadow/outline
+        this.ctx.strokeStyle = '#2c3e50';
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
+        
+        // Windshield
+        this.ctx.fillStyle = 'rgba(52, 152, 219, 0.3)';
+        this.ctx.fillRect(x + 5, y + 8, width - 10, 18);
+        
+        // Side windows
+        this.ctx.fillStyle = 'rgba(52, 152, 219, 0.2)';
+        this.ctx.fillRect(x + 3, y + 12, 8, 12);
+        this.ctx.fillRect(x + width - 11, y + 12, 8, 12);
+        
+        // Headlights
+        this.ctx.fillStyle = accent;
+        this.ctx.beginPath();
+        this.ctx.arc(x + 8, y + 5, 3, 0, Math.PI * 2);
+        this.ctx.arc(x + width - 8, y + 5, 3, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Grille
+        this.ctx.fillStyle = '#2c3e50';
+        this.ctx.fillRect(x + 12, y + 2, width - 24, 4);
+        
+        // Wheels with rims
+        this.ctx.fillStyle = '#2c3e50';
+        this.ctx.beginPath();
+        this.ctx.arc(x - 2, y + 18, 6, 0, Math.PI * 2);
+        this.ctx.arc(x + width + 2, y + 18, 6, 0, Math.PI * 2);
+        this.ctx.arc(x - 2, y + height - 18, 6, 0, Math.PI * 2);
+        this.ctx.arc(x + width + 2, y + height - 18, 6, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Wheel rims
+        this.ctx.fillStyle = accent;
+        this.ctx.beginPath();
+        this.ctx.arc(x - 2, y + 18, 4, 0, Math.PI * 2);
+        this.ctx.arc(x + width + 2, y + 18, 4, 0, Math.PI * 2);
+        this.ctx.arc(x - 2, y + height - 18, 4, 0, Math.PI * 2);
+        this.ctx.arc(x + width + 2, y + height - 18, 4, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Brand logo (simplified)
+        if (isPlayer) {
+            this.ctx.fillStyle = '#fff';
+            this.ctx.font = 'bold 8px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText('🏎️', x + width/2, y + height/2 + 3);
+        }
+        
+        // Side mirrors
+        this.ctx.fillStyle = color;
+        this.ctx.fillRect(x - 3, y + 8, 2, 4);
+        this.ctx.fillRect(x + width + 1, y + 8, 2, 4);
     }
     
     drawEffects() {

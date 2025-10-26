@@ -11,8 +11,18 @@
         <div class="game-header">
             <h1>🏎️ Car Racing Game</h1>
             <div class="score-display">
-                <span>Score: <span id="score">0</span></span>
-                <span>Speed: <span id="speed">1</span></span>
+                <div class="score-item">
+                    <span class="score-label">🏆 Score</span>
+                    <span id="score" class="score-value">0</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-label">⚡ Speed</span>
+                    <span id="speed" class="score-value">1</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-label">🚗 Cars Avoided</span>
+                    <span id="carsAvoided" class="score-value">0</span>
+                </div>
             </div>
         </div>
         
@@ -34,7 +44,11 @@
         
         <div id="gameOver" class="game-over hidden">
             <h2>💥 Game Over!</h2>
-            <p>Final Score: <span id="finalScore">0</span></p>
+            <div class="final-stats">
+                <p>🏆 Final Score: <span id="finalScore">0</span></p>
+                <p>🚗 Cars Avoided: <span id="finalCarsAvoided">0</span></p>
+                <p>⚡ Max Speed: <span id="finalSpeed">1</span></p>
+            </div>
             <button id="restartBtn" class="btn">Play Again</button>
         </div>
     </div>
